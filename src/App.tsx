@@ -21,10 +21,10 @@ const MEDIA_ASSETS = {
     parquinhoInfantil: '/midias/imagem.comodidade-parquinho-infantil.jpg',
     espacoZen: '/midias/imagem.comodidade-espaco-zen.jpg',
   },
-  galeria: Array.from({ length: 12 }, (_, i) => `/midias/imagem.galeria-${String(i + 1).padStart(2, '0')}.jpg`),
+  galeria: Array.from({ length: 18 }, (_, i) => `/midias/imagem.galeria-${String(i + 1).padStart(2, '0')}.jpg`),
   plantas: {
     inferior: '/midias/imagem.planta-inferior.png',
-    superior: '/midias/imagem.planta-superior.jpg',
+    superior: '/midias/imagem.planta-superior.png',
   },
   localizacaoVideo: '/midias/video.localizacao.mp4',
   localizacaoPoster: '/midias/imagem.localizacao-poster.jpg',
@@ -42,11 +42,22 @@ function App() {
 
   const scrollGallery = (direction: 'left' | 'right') => {
     if (galleryRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = galleryRef.current;
       const scrollAmount = window.innerWidth * 0.8;
-      galleryRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
+      
+      if (direction === 'right') {
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          galleryRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          galleryRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+      } else {
+        if (scrollLeft <= 10) {
+          galleryRef.current.scrollTo({ left: scrollWidth, behavior: 'smooth' });
+        } else {
+          galleryRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+      }
     }
   };
 
@@ -159,7 +170,7 @@ function App() {
             <img 
               src={isScrolled ? MEDIA_ASSETS.logoVerde : MEDIA_ASSETS.logoBranco} 
               alt="Villagio Entre Verdes" 
-              className="h-10 md:h-12 w-auto object-contain transition-all duration-500"
+              className="h-16 md:h-20 w-auto object-contain transition-all duration-500"
             />
           </a>
 
@@ -265,8 +276,8 @@ function App() {
             className="mb-12 flex flex-col items-center justify-center"
           >
             <div className="flex flex-col items-center">
-              <span className="font-serif text-2xl md:text-3xl text-white tracking-[0.25em] uppercase font-light">Villagio</span>
-              <span className="font-sans text-[0.65rem] md:text-xs text-white/70 tracking-[0.5em] uppercase font-light mt-2 block">Entre Verdes</span>
+              <span className="font-serif text-4xl md:text-5xl lg:text-6xl text-white tracking-[0.25em] uppercase font-light">Villagio</span>
+              <span className="font-sans text-[0.5rem] md:text-[0.6rem] text-white/70 tracking-[0.5em] uppercase font-light mt-2 block">Entre Verdes</span>
             </div>
           </motion.div>
           
@@ -643,10 +654,6 @@ function App() {
                     src={MEDIA_ASSETS.plantas.inferior} 
                     alt="Planta Inferior" 
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" 
-                    onError={(e) => {
-                      e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
-                      e.currentTarget.className = "w-full h-full object-cover group-hover:scale-105 transition-transform duration-700";
-                    }}
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
                     <ZoomIn className="text-[#2C4C3B] opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-12 h-12 drop-shadow-sm" />
@@ -663,10 +670,6 @@ function App() {
                     src={MEDIA_ASSETS.plantas.superior} 
                     alt="Planta Superior" 
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" 
-                    onError={(e) => {
-                      e.currentTarget.src = "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
-                      e.currentTarget.className = "w-full h-full object-cover group-hover:scale-105 transition-transform duration-700";
-                    }}
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
                     <ZoomIn className="text-[#2C4C3B] opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-12 h-12 drop-shadow-sm" />
@@ -679,7 +682,7 @@ function App() {
       </section>
 
       {/* Gallery Section (Horizontal Scroll) */}
-      <section id="galeria" className="py-32 md:py-48 bg-[#556B2F]">
+      <section id="galeria" className="py-32 md:py-48 bg-[#556B2F] relative group/gallery">
         <div className="max-w-[100vw] overflow-hidden relative">
           <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16 flex justify-between items-end">
             <motion.div 
@@ -692,24 +695,23 @@ function App() {
               <h2 className="text-5xl md:text-7xl font-serif text-white mb-8 tracking-tight">Galeria</h2>
               <div className="w-12 h-[1px] bg-[#F8F2E3]"></div>
             </motion.div>
-            
-            <div className="hidden md:flex gap-4">
-              <button 
-                onClick={() => scrollGallery('left')} 
-                className="p-4 rounded-full border border-white/30 text-white hover:bg-white/10 transition-colors"
-                aria-label="Anterior"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button 
-                onClick={() => scrollGallery('right')} 
-                className="p-4 rounded-full border border-white/30 text-white hover:bg-white/10 transition-colors"
-                aria-label="Próxima"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-            </div>
           </div>
+
+          {/* Desktop Navigation Arrows */}
+          <button 
+            onClick={() => scrollGallery('left')}
+            className="hidden lg:flex absolute left-8 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-[#556B2F] p-4 rounded-full shadow-lg opacity-0 group-hover/gallery:opacity-100 transition-all duration-300"
+            aria-label="Anterior"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button 
+            onClick={() => scrollGallery('right')}
+            className="hidden lg:flex absolute right-8 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-[#556B2F] p-4 rounded-full shadow-lg opacity-0 group-hover/gallery:opacity-100 transition-all duration-300"
+            aria-label="Próxima"
+          >
+            <ChevronRight size={24} />
+          </button>
 
           <div ref={galleryRef} className="flex overflow-x-auto snap-x snap-mandatory gap-8 px-6 md:px-12 pb-16 pt-8 hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', scrollBehavior: 'smooth' }}>
             {MEDIA_ASSETS.galeria.map((imgSrc, index) => (
@@ -761,22 +763,6 @@ function App() {
               <p className="text-xl text-gray-600 mb-12 leading-relaxed font-light">
                 Venha tomar um café e conhecer de perto o Villagio Entre Verdes — um projeto pensado para quem valoriza qualidade de vida, natureza e exclusividade.
               </p>
-              
-              <div className="bg-white p-8 md:p-10 rounded-xl shadow-xl border border-gray-100 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-2 h-full bg-[#A64322] transition-all duration-300 group-hover:w-3"></div>
-                <div className="flex items-start">
-                  <div className="bg-[#F8F2E3] p-4 rounded-full mr-6 shrink-0">
-                    <MapPin className="w-8 h-8 text-[#A64322]" />
-                  </div>
-                  <div>
-                    <h4 className="font-serif text-2xl text-[#2C4C3B] mb-3">Endereço</h4>
-                    <p className="text-gray-700 text-lg leading-relaxed font-medium">
-                      R. Marcelo Pedroni, 506<br/>
-                      <span className="text-gray-500 font-light">Vila Miranda, Sumaré/SP</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
             </motion.div>
             
             <motion.div 
@@ -786,35 +772,22 @@ function App() {
               variants={fadeInUp}
               className="lg:col-span-7 order-1 lg:order-2 h-[50vh] md:h-[70vh] w-full rounded-2xl overflow-hidden shadow-2xl bg-gray-200"
             >
-              {import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
-                <iframe 
-                  src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent("R. Marcelo Pedroni, 506 - Vila Miranda, Sumaré - SP, Brasil")}`}
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 0 }} 
-                  allowFullScreen={false} 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="grayscale hover:grayscale-0 transition-all duration-1000"
-                ></iframe>
-              ) : (
-                <div className="w-full h-full bg-[#2C4C3B] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
-                  <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                  <MapPin className="w-16 h-16 text-[#F8F2E3] mb-6 relative z-10" />
-                  <h3 className="text-3xl font-serif text-white mb-4 relative z-10">Localização Privilegiada</h3>
-                  <p className="text-[#F8F2E3] text-lg mb-8 max-w-md relative z-10 font-light">
-                    R. Marcelo Pedroni, 506<br/>Vila Miranda, Sumaré/SP
-                  </p>
-                  <a 
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("R. Marcelo Pedroni, 506 - Vila Miranda, Sumaré - SP, Brasil")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center bg-[#A64322] text-white px-8 py-4 rounded-full font-medium tracking-wide hover:bg-[#8A361A] transition-colors relative z-10 shadow-lg"
-                  >
-                    Abrir no Google Maps
-                  </a>
-                </div>
-              )}
+              <div className="w-full h-full bg-[#2C4C3B] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                <MapPin className="w-16 h-16 text-[#F8F2E3] mb-6 relative z-10" />
+                <h3 className="text-3xl font-serif text-white mb-4 relative z-10">Localização Privilegiada</h3>
+                <p className="text-[#F8F2E3] text-lg mb-8 max-w-md relative z-10 font-light">
+                  R. Marcelo Pedroni, 506<br/>Vila Miranda, Sumaré/SP
+                </p>
+                <a 
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("R. Marcelo Pedroni, 506 - Vila Miranda, Sumaré - SP, Brasil")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center bg-[#A64322] text-white px-8 py-4 rounded-full font-medium tracking-wide hover:bg-[#8A361A] transition-colors relative z-10 shadow-lg"
+                >
+                  Abrir no Google Maps
+                </a>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -943,7 +916,7 @@ function App() {
               
               <div className="mt-16 md:mt-auto pt-8">
                 <h4 className="text-white/50 font-medium mb-4 uppercase tracking-widest text-[0.65rem]">Desenvolvimento</h4>
-                <img src={MEDIA_ASSETS.logoDomus} alt="Domus Inc" className="h-8 w-auto object-contain brightness-0 invert opacity-80" />
+                <img src={MEDIA_ASSETS.logoDomus} alt="Domus Inc" className="h-16 md:h-20 w-auto object-contain brightness-0 invert opacity-80" />
               </div>
             </div>
             
