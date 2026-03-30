@@ -23,7 +23,7 @@ const MEDIA_ASSETS = {
   },
   galeria: Array.from({ length: 12 }, (_, i) => `/midias/imagem.galeria-${String(i + 1).padStart(2, '0')}.jpg`),
   plantas: {
-    inferior: '/midias/imagem.planta-inferior.jpg',
+    inferior: '/midias/imagem.planta-inferior.png',
     superior: '/midias/imagem.planta-superior.jpg',
   },
   localizacaoVideo: '/midias/video.localizacao.mp4',
